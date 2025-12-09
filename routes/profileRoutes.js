@@ -2,7 +2,7 @@
 
 // import express from "express";
 // import multer from "multer";
-// import Profile from "../models/profile.js";
+// import Profile from "../models/Profile.js";
 
 // const router = express.Router();
 
