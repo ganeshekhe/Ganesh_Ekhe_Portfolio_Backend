@@ -49,4 +49,4 @@ const profileSchema = new mongoose.Schema({
   email: String,
 });
 
-export default mongoose.model("Profile", profileSchema);
+export default mongoose.model("profile", profileSchema);
