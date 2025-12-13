@@ -485,5 +485,19 @@ router.put("/:id", auth, upload("projects"), async (req, res) => {
     res.status(500).json({ error: "Update failed" });
   }
 });
+// GET Project Image
+router.get("/image/:filename", async (req, res) => {
+  try {
+    const file = await gfs.files.findOne({ filename: req.params.filename });
+    if (!file || !file.contentType.startsWith("image")) return res.status(404).send("Not found");
+
+    const readstream = gfs.createReadStream({ filename: file.filename });
+    res.set("Content-Type", file.contentType);
+    readstream.pipe(res);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server Error");
+  }
+});
 
 export default router;
