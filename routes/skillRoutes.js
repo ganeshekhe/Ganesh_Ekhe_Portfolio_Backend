@@ -430,44 +430,64 @@ router.get("/", async (req, res) => {
 /* --------------------------------------
    UPDATE SKILL (supports new icon upload)
 ----------------------------------------- */
-router.put("/:id", auth, upload("skills").single("icon"), async (req, res) => {
+// router.put("/:id", auth, upload("skills").single("icon"), async (req, res) => {
+//   try {
+//     const {
+//       name,
+//       level,
+//       difficulty,
+//       category,
+//       experience,
+//       usedInProjects,
+//       order,
+//       iconName,
+//     } = req.body;
+
+//     const updateData = {};
+
+//     if (name) updateData.name = name.trim();
+//     if (level) updateData.level = Number(level);
+//     if (difficulty) updateData.difficulty = Number(difficulty);
+//     if (category) updateData.category = category;
+//     if (experience) updateData.experience = String(experience);
+//     if (usedInProjects) updateData.usedInProjects = Number(usedInProjects);
+//     if (order) updateData.order = Number(order);
+
+//     if (req.file) updateData.icon = `skills/${req.file.filename}`;
+//     else if (iconName) updateData.icon = iconName;
+
+//     const skill = await Skill.findByIdAndUpdate(req.params.id, updateData, { new: true });
+
+//     if (!skill) return res.status(404).json({ error: "Skill not found" });
+
+//     res.json({ success: true, skill });
+
+//   } catch (err) {
+//     console.log("Update Skill Error:", err);
+//     res.status(500).json({ error: "Failed to update skill" });
+//   }
+// });
+router.put("/:id", auth, upload("skills"), async (req, res) => {
   try {
-    const {
-      name,
-      level,
-      difficulty,
-      category,
-      experience,
-      usedInProjects,
-      order,
-      iconName,
-    } = req.body;
+    const skillId = req.params.id;
 
-    const updateData = {};
+    // file info GridFS मधून घेणे
+    const fileData = req.filesGridFS ? req.filesGridFS[0] : null;
 
-    if (name) updateData.name = name.trim();
-    if (level) updateData.level = Number(level);
-    if (difficulty) updateData.difficulty = Number(difficulty);
-    if (category) updateData.category = category;
-    if (experience) updateData.experience = String(experience);
-    if (usedInProjects) updateData.usedInProjects = Number(usedInProjects);
-    if (order) updateData.order = Number(order);
+    const updatedSkill = await Skill.findByIdAndUpdate(
+      skillId,
+      {
+        name: req.body.name,
+        icon: fileData ? fileData.filename : undefined,
+      },
+      { new: true }
+    );
 
-    if (req.file) updateData.icon = `skills/${req.file.filename}`;
-    else if (iconName) updateData.icon = iconName;
-
-    const skill = await Skill.findByIdAndUpdate(req.params.id, updateData, { new: true });
-
-    if (!skill) return res.status(404).json({ error: "Skill not found" });
-
-    res.json({ success: true, skill });
-
+    res.json(updatedSkill);
   } catch (err) {
-    console.log("Update Skill Error:", err);
-    res.status(500).json({ error: "Failed to update skill" });
+    res.status(500).json({ error: err.message });
   }
 });
-
 /* --------------------------------------
    DELETE SKILL
 ----------------------------------------- */
