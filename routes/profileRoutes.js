@@ -263,7 +263,7 @@
 // export default router;
 import express from "express";
 import mongoose from "mongoose";
-import Profile from "../models/Profile.js";
+import Profile from "../models/profile.js";
 import auth from "../middleware/auth.js";
 // import upload from "../utils/upload.js";
 import upload from "../middleware/upload.js";
