@@ -58,36 +58,120 @@
 // export default router;
 
 
+// import express from "express";
+// import multer from "multer";
+// import Profile from "../models/profile.js";
+
+// const router = express.Router();
+
+// /* --------------------------------------------
+//    MULTER STORAGE (Proper folder structure)
+// --------------------------------------------- */
+
+// const storage = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     // dynamic folder
+//     if (file.fieldname === "image") cb(null, "uploads/profile/images/");
+//     else if (file.fieldname === "resume") cb(null, "uploads/profile/resume/");
+//     else if (file.fieldname === "certificates") cb(null, "uploads/profile/certificates/");
+//     else cb(null, "uploads/");
+//   },
+//   filename: (req, file, cb) => {
+//     const ext = file.originalname.split(".").pop();
+//     cb(null, Date.now() + "-" + file.fieldname + "." + ext);
+//   },
+// });
+
+// const upload = multer({ storage });
+
+// /* --------------------------------------------
+//    GET PROFILE 
+// --------------------------------------------- */
+
+// router.get("/", async (req, res) => {
+//   try {
+//     const profile = await Profile.findOne();
+//     res.json(profile);
+//   } catch (err) {
+//     res.status(500).json({ error: "Failed to fetch profile" });
+//   }
+// });
+
+// /* --------------------------------------------
+//    UPDATE PROFILE (WITH FILE UPLOADS)
+// --------------------------------------------- */
+
+// router.put(
+//   "/",
+//   upload.fields([
+//     { name: "image", maxCount: 1 },
+//     { name: "resume", maxCount: 1 },
+//     { name: "certificates", maxCount: 20 },
+//   ]),
+//   async (req, res) => {
+//     try {
+//       const data = req.body;
+
+//       // Convert empty fields safely
+//       if (typeof data.github === "undefined") data.github = "";
+//       if (typeof data.linkedin === "undefined") data.linkedin = "";
+//       if (typeof data.email === "undefined") data.email = "";
+
+//       /* --- Image Upload --- */
+//       if (req.files.image) {
+//         data.image = "profile/images/" + req.files.image[0].filename;
+//       }
+
+//       /* --- Resume Upload --- */
+//       if (req.files.resume) {
+//         data.resume = "profile/resume/" + req.files.resume[0].filename;
+//       }
+
+//       /* --- Certificates Upload --- */
+//       if (req.files.certificates) {
+//         data.certificates = req.files.certificates.map(
+//           (f) => "profile/certificates/" + f.filename
+//         );
+//       }
+
+//       // Update or create (upsert)
+//       const updated = await Profile.findOneAndUpdate({}, data, {
+//         new: true,
+//         upsert: true,
+//       });
+
+//       res.json({ success: true, profile: updated });
+
+//     } catch (err) {
+//       console.log(err);
+//       res.status(500).json({ error: "Update failed" });
+//     }
+//   }
+// );
+
+// export default router;
 import express from "express";
 import multer from "multer";
+import mongoose from "mongoose";
+import Grid from "gridfs-stream";
 import Profile from "../models/profile.js";
 
 const router = express.Router();
 
-/* --------------------------------------------
-   MULTER STORAGE (Proper folder structure)
---------------------------------------------- */
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    // dynamic folder
-    if (file.fieldname === "image") cb(null, "uploads/profile/images/");
-    else if (file.fieldname === "resume") cb(null, "uploads/profile/resume/");
-    else if (file.fieldname === "certificates") cb(null, "uploads/profile/certificates/");
-    else cb(null, "uploads/");
-  },
-  filename: (req, file, cb) => {
-    const ext = file.originalname.split(".").pop();
-    cb(null, Date.now() + "-" + file.fieldname + "." + ext);
-  },
+// MongoDB connection (for GridFS)
+const conn = mongoose.connection;
+let gfs;
+conn.once("open", () => {
+  gfs = Grid(conn.db, mongoose.mongo);
+  gfs.collection("profile_files");
+  console.log("GridFS Connected for Profile");
 });
 
+/* ---------------- MULTER SETUP (memoryStorage) ---------------- */
+const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-/* --------------------------------------------
-   GET PROFILE 
---------------------------------------------- */
-
+/* ---------------- GET PROFILE ---------------- */
 router.get("/", async (req, res) => {
   try {
     const profile = await Profile.findOne();
@@ -97,10 +181,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-/* --------------------------------------------
-   UPDATE PROFILE (WITH FILE UPLOADS)
---------------------------------------------- */
-
+/* ---------------- UPDATE PROFILE (WITH GRIDFS FILES) ---------------- */
 router.put(
   "/",
   upload.fields([
@@ -113,25 +194,46 @@ router.put(
       const data = req.body;
 
       // Convert empty fields safely
-      if (typeof data.github === "undefined") data.github = "";
-      if (typeof data.linkedin === "undefined") data.linkedin = "";
-      if (typeof data.email === "undefined") data.email = "";
+      if (!data.github) data.github = "";
+      if (!data.linkedin) data.linkedin = "";
+      if (!data.email) data.email = "";
 
       /* --- Image Upload --- */
       if (req.files.image) {
-        data.image = "profile/images/" + req.files.image[0].filename;
+        const imgFile = req.files.image[0];
+        const writestream = gfs.createWriteStream({
+          filename: "profile_image_" + Date.now() + "_" + imgFile.originalname,
+          content_type: imgFile.mimetype,
+        });
+        writestream.write(imgFile.buffer);
+        writestream.end();
+        data.image = writestream.filename;
       }
 
       /* --- Resume Upload --- */
       if (req.files.resume) {
-        data.resume = "profile/resume/" + req.files.resume[0].filename;
+        const resumeFile = req.files.resume[0];
+        const writestream = gfs.createWriteStream({
+          filename: "profile_resume_" + Date.now() + "_" + resumeFile.originalname,
+          content_type: resumeFile.mimetype,
+        });
+        writestream.write(resumeFile.buffer);
+        writestream.end();
+        data.resume = writestream.filename;
       }
 
       /* --- Certificates Upload --- */
       if (req.files.certificates) {
-        data.certificates = req.files.certificates.map(
-          (f) => "profile/certificates/" + f.filename
-        );
+        data.certificates = [];
+        for (const certFile of req.files.certificates) {
+          const writestream = gfs.createWriteStream({
+            filename: "profile_cert_" + Date.now() + "_" + certFile.originalname,
+            content_type: certFile.mimetype,
+          });
+          writestream.write(certFile.buffer);
+          writestream.end();
+          data.certificates.push(writestream.filename);
+        }
       }
 
       // Update or create (upsert)
@@ -141,12 +243,21 @@ router.put(
       });
 
       res.json({ success: true, profile: updated });
-
     } catch (err) {
       console.log(err);
       res.status(500).json({ error: "Update failed" });
     }
   }
 );
+
+/* ---------------- FETCH FILES FROM GRIDFS ---------------- */
+router.get("/file/:filename", (req, res) => {
+  gfs.files.findOne({ filename: req.params.filename }, (err, file) => {
+    if (!file || file.length === 0) return res.status(404).json({ error: "File not found" });
+    const readstream = gfs.createReadStream(file.filename);
+    res.set("Content-Type", file.contentType);
+    readstream.pipe(res);
+  });
+});
 
 export default router;
