@@ -2,87 +2,176 @@
 
 
 
-// // new 
+// // // new 
 
-// import express from "express";
-// import cors from "cors";
-// import dotenv from "dotenv";
-// import mongoose from "mongoose";
-// import nodemailer from "nodemailer";
+// // import express from "express";
+// // import cors from "cors";
+// // import dotenv from "dotenv";
+// // import mongoose from "mongoose";
+// // import nodemailer from "nodemailer";
 
-// // Routes
-// import adminRoutes from "./routes/adminRoutes.js";
-// import projectRoutes from "./routes/projectRoutes.js";
-// import skillRoutes from "./routes/skillRoutes.js";
+// // // Routes
+// // import adminRoutes from "./routes/adminRoutes.js";
+// // import projectRoutes from "./routes/projectRoutes.js";
+// // import skillRoutes from "./routes/skillRoutes.js";
+// // // import profileRoutes from "./routes/profileRoutes.js";
 // // import profileRoutes from "./routes/profileRoutes.js";
-// import profileRoutes from "./routes/profileRoutes.js";
-// dotenv.config();
+// // dotenv.config();
 
-// const app = express();
+// // const app = express();
 
-// // Middlewares
-// app.use(cors());
-// app.use(express.json());
+// // // Middlewares
+// // app.use(cors());
+// // app.use(express.json());
 
-// app.use("/uploads", express.static("uploads"));
+// // app.use("/uploads", express.static("uploads"));
 
-// // TEST ROUTE
-// app.get("/", (req, res) => {
-//   res.send("Backend Working!");
-// });
+// // // TEST ROUTE
+// // app.get("/", (req, res) => {
+// //   res.send("Backend Working!");
+// // });
 
-// // ADMIN ROUTES (register/login)
-// app.use("/admin", adminRoutes);
+// // // ADMIN ROUTES (register/login)
+// // app.use("/admin", adminRoutes);
 
-// // CONTACT API
-// app.post("/contact", async (req, res) => {
-//   const { name, email, message } = req.body;
-//   if (!name || !email || !message) {
-//     return res.status(400).json({ error: "All fields are required" });
-//   }
-//   try {
-//     const transporter = nodemailer.createTransport({
-//       service: "gmail",
-//       auth: {
-//         user: process.env.EMAIL_USER,
-//         pass: process.env.EMAIL_PASS,
-//       },
-//     });
+// // // CONTACT API
+// // app.post("/contact", async (req, res) => {
+// //   const { name, email, message } = req.body;
+// //   if (!name || !email || !message) {
+// //     return res.status(400).json({ error: "All fields are required" });
+// //   }
+// //   try {
+// //     const transporter = nodemailer.createTransport({
+// //       service: "gmail",
+// //       auth: {
+// //         user: process.env.EMAIL_USER,
+// //         pass: process.env.EMAIL_PASS,
+// //       },
+// //     });
 
-//     await transporter.sendMail({
-//       from: email,
-//       to: process.env.EMAIL_USER,
-//       subject: `New message from ${name}`,
-//       text: `From: ${email}\n\n${message}`,
-//     });
+// //     await transporter.sendMail({
+// //       from: email,
+// //       to: process.env.EMAIL_USER,
+// //       subject: `New message from ${name}`,
+// //       text: `From: ${email}\n\n${message}`,
+// //     });
 
-//     res.json({ success: true, message: "Email sent successfully!" });
-//   } catch (err) {
-//     console.error("Mail send error:", err);
-//     res.status(500).json({ error: "Email sending failed" });
-//   }
-// });
+// //     res.json({ success: true, message: "Email sent successfully!" });
+// //   } catch (err) {
+// //     console.error("Mail send error:", err);
+// //     res.status(500).json({ error: "Email sending failed" });
+// //   }
+// // });
 
-// // API ROUTES (protected where needed)
-// app.use("/projects", projectRoutes);
-// app.use("/skills", skillRoutes);
+// // // API ROUTES (protected where needed)
+// // app.use("/projects", projectRoutes);
+// // app.use("/skills", skillRoutes);
+// // // app.use("/profile", profileRoutes);
 // // app.use("/profile", profileRoutes);
-// app.use("/profile", profileRoutes);
 
-// // MongoDB connect and start server
-// const PORT = process.env.PORT || 5000;
-// mongoose
-//   .connect(process.env.MONGO_URI)
-//   .then(() => {
-//     console.log("MongoDB Connected");
-//     app.listen(PORT, () => console.log("Server running on port", PORT));
-//   })
-//   .catch((err) => {
-//     console.error("DB Error:", err);
-//   });
-
+// // // MongoDB connect and start server
+// // const PORT = process.env.PORT || 5000;
+// // mongoose
+// //   .connect(process.env.MONGO_URI)
+// //   .then(() => {
+// //     console.log("MongoDB Connected");
+// //     app.listen(PORT, () => console.log("Server running on port", PORT));
+// //   })
+// //   .catch((err) => {
+// //     console.error("DB Error:", err);
+// //   });
 
 
+
+// // import express from "express";
+// // import cors from "cors";
+// // import dotenv from "dotenv";
+// // import mongoose from "mongoose";
+// // import nodemailer from "nodemailer";
+// // import Grid from "gridfs-stream";
+
+// // // Routes
+// // import adminRoutes from "./routes/adminRoutes.js";
+// // import projectRoutes from "./routes/projectRoutes.js";
+// // import skillRoutes from "./routes/skillRoutes.js";
+// // import profileRoutes from "./routes/profileRoutes.js";
+
+// // dotenv.config();
+
+// // const app = express();
+
+// // // Middlewares
+// // app.use(cors());
+// // app.use(express.json());
+
+// // // MongoDB connection
+// // const mongoURI = process.env.MONGO_URI;
+// // const conn = mongoose.createConnection(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true });
+
+// // let gfs;
+// // conn.once("open", () => {
+// //   gfs = Grid(conn.db, mongoose.mongo);
+// //   gfs.collection("projects");
+// //   console.log("GridFS Connected");
+// // });
+
+// // // Serve GridFS files
+// // app.get("/uploads/projects/:filename", (req, res) => {
+// //   gfs.files.findOne({ filename: req.params.filename }, (err, file) => {
+// //     if (!file || file.length === 0) return res.status(404).json({ error: "File not found" });
+// //     const readstream = gfs.createReadStream(file.filename);
+// //     readstream.pipe(res);
+// //   });
+// // });
+
+// // // TEST ROUTE
+// // app.get("/", (req, res) => {
+// //   res.send("Backend Working!");
+// // });
+
+// // // ADMIN ROUTES
+// // app.use("/admin", adminRoutes);
+
+// // // CONTACT API
+// // app.post("/contact", async (req, res) => {
+// //   const { name, email, message } = req.body;
+// //   if (!name || !email || !message) {
+// //     return res.status(400).json({ error: "All fields are required" });
+// //   }
+// //   try {
+// //     const transporter = nodemailer.createTransport({
+// //       service: "gmail",
+// //       auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
+// //     });
+
+// //     await transporter.sendMail({
+// //       from: email,
+// //       to: process.env.EMAIL_USER,
+// //       subject: `New message from ${name}`,
+// //       text: `From: ${email}\n\n${message}`,
+// //     });
+
+// //     res.json({ success: true, message: "Email sent successfully!" });
+// //   } catch (err) {
+// //     console.error("Mail send error:", err);
+// //     res.status(500).json({ error: "Email sending failed" });
+// //   }
+// // });
+
+// // // API ROUTES
+// // app.use("/projects", projectRoutes);
+// // app.use("/skills", skillRoutes);
+// // app.use("/profile", profileRoutes);
+
+// // // Start Server
+// // const PORT = process.env.PORT || 5000;
+// // mongoose
+// //   .connect(mongoURI)
+// //   .then(() => {
+// //     console.log("MongoDB Connected");
+// //     app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// //   })
+// //   .catch((err) => console.error("DB Error:", err));
 // import express from "express";
 // import cors from "cors";
 // import dotenv from "dotenv";
@@ -104,20 +193,21 @@
 // app.use(cors());
 // app.use(express.json());
 
-// // MongoDB connection
+// // MongoDB Atlas connection
 // const mongoURI = process.env.MONGO_URI;
-// const conn = mongoose.createConnection(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true });
+// const conn = mongoose.createConnection(mongoURI);
 
 // let gfs;
 // conn.once("open", () => {
 //   gfs = Grid(conn.db, mongoose.mongo);
-//   gfs.collection("projects");
-//   console.log("GridFS Connected");
+//   gfs.collection("uploads"); // default collection for GridFS
+//   console.log("✅ GridFS Connected to MongoDB Atlas");
 // });
 
 // // Serve GridFS files
-// app.get("/uploads/projects/:filename", (req, res) => {
-//   gfs.files.findOne({ filename: req.params.filename }, (err, file) => {
+// app.get("/uploads/:folder/:filename", (req, res) => {
+//   const { filename } = req.params;
+//   gfs.files.findOne({ filename }, (err, file) => {
 //     if (!file || file.length === 0) return res.status(404).json({ error: "File not found" });
 //     const readstream = gfs.createReadStream(file.filename);
 //     readstream.pipe(res);
@@ -135,9 +225,8 @@
 // // CONTACT API
 // app.post("/contact", async (req, res) => {
 //   const { name, email, message } = req.body;
-//   if (!name || !email || !message) {
-//     return res.status(400).json({ error: "All fields are required" });
-//   }
+//   if (!name || !email || !message) return res.status(400).json({ error: "All fields are required" });
+
 //   try {
 //     const transporter = nodemailer.createTransport({
 //       service: "gmail",
@@ -165,13 +254,14 @@
 
 // // Start Server
 // const PORT = process.env.PORT || 5000;
+
 // mongoose
 //   .connect(mongoURI)
 //   .then(() => {
-//     console.log("MongoDB Connected");
-//     app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+//     console.log("✅ MongoDB Connected via Mongoose");
+//     app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
 //   })
-//   .catch((err) => console.error("DB Error:", err));
+//   .catch((err) => console.error("❌ DB Connection Error:", err));
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -189,24 +279,32 @@ dotenv.config();
 
 const app = express();
 
-// Middlewares
+// ---------------- MIDDLEWARES ----------------
 app.use(cors());
 app.use(express.json());
 
-// MongoDB Atlas connection
+// ---------------- MONGODB CONNECTION ----------------
 const mongoURI = process.env.MONGO_URI;
-const conn = mongoose.createConnection(mongoURI);
 
+// Main connection for Mongoose
+mongoose
+  .connect(mongoURI)
+  .then(() => console.log("✅ MongoDB Connected via Mongoose"))
+  .catch((err) => console.error("MongoDB Connection Error:", err));
+
+// Separate connection for GridFS
+const conn = mongoose.createConnection(mongoURI);
 let gfs;
+
 conn.once("open", () => {
   gfs = Grid(conn.db, mongoose.mongo);
-  gfs.collection("uploads"); // default collection for GridFS
-  console.log("✅ GridFS Connected to MongoDB Atlas");
+  gfs.collection("uploads");
+  console.log("✅ GridFS Connected for dynamic uploads");
 });
 
-// Serve GridFS files
+// ---------------- SERVE GRIDFS FILES ----------------
 app.get("/uploads/:folder/:filename", (req, res) => {
-  const { filename } = req.params;
+  const { folder, filename } = req.params;
   gfs.files.findOne({ filename }, (err, file) => {
     if (!file || file.length === 0) return res.status(404).json({ error: "File not found" });
     const readstream = gfs.createReadStream(file.filename);
@@ -214,19 +312,20 @@ app.get("/uploads/:folder/:filename", (req, res) => {
   });
 });
 
-// TEST ROUTE
+// ---------------- TEST ROUTE ----------------
 app.get("/", (req, res) => {
   res.send("Backend Working!");
 });
 
-// ADMIN ROUTES
+// ---------------- ADMIN ROUTES ----------------
 app.use("/admin", adminRoutes);
 
-// CONTACT API
+// ---------------- CONTACT API ----------------
 app.post("/contact", async (req, res) => {
   const { name, email, message } = req.body;
-  if (!name || !email || !message) return res.status(400).json({ error: "All fields are required" });
-
+  if (!name || !email || !message) {
+    return res.status(400).json({ error: "All fields are required" });
+  }
   try {
     const transporter = nodemailer.createTransport({
       service: "gmail",
@@ -247,18 +346,14 @@ app.post("/contact", async (req, res) => {
   }
 });
 
-// API ROUTES
+// ---------------- API ROUTES ----------------
 app.use("/projects", projectRoutes);
 app.use("/skills", skillRoutes);
 app.use("/profile", profileRoutes);
 
-// Start Server
+// ---------------- START SERVER ----------------
 const PORT = process.env.PORT || 5000;
 
-mongoose
-  .connect(mongoURI)
-  .then(() => {
-    console.log("✅ MongoDB Connected via Mongoose");
-    app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
-  })
-  .catch((err) => console.error("❌ DB Connection Error:", err));
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});
