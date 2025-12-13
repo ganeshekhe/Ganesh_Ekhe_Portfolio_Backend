@@ -509,7 +509,7 @@ import express from "express";
 import mongoose from "mongoose";
 import Skill from "../models/Skill.js";
 import auth from "../middleware/auth.js";
-// import upload from "../utils/upload.js";
+
 import upload from "../middleware/upload.js";
 import Grid from "gridfs-stream";
 
