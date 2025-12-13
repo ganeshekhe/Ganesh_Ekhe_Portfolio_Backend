@@ -352,42 +352,68 @@ const router = express.Router();
 /* --------------------------------------
    CREATE SKILL (supports icon upload)
 ----------------------------------------- */
-router.post("/", auth, upload("skills").single("icon"), async (req, res) => {
+// router.post("/", auth, upload("skills").single("icon"), async (req, res) => {
+//   try {
+//     const {
+//       name,
+//       level,
+//       difficulty,
+//       category,
+//       experience,
+//       usedInProjects,
+//       order,
+//       iconName,
+//     } = req.body;
+
+//     if (!name || !level) {
+//       return res.status(400).json({ error: "Name & Level are required" });
+//     }
+
+//     const skill = await Skill.create({
+//       name: name.trim(),
+//       level: Number(level),
+//       difficulty: Number(difficulty) || 1,
+//       category: category || "General",
+//       experience: experience ? String(experience) : "0 months",
+//       usedInProjects: Number(usedInProjects) || 0,
+//       order: Number(order) || 0,
+//       icon: req.file ? `skills/${req.file.filename}` : (iconName || "Code2"),
+//     });
+
+//     res.json({ success: true, skill });
+
+//   } catch (err) {
+//     console.log("Create Skill Error:", err);
+//     res.status(500).json({ error: "Failed to create skill" });
+//   }
+// });
+router.post("/", auth, upload("skills"), async (req, res) => {
   try {
-    const {
-      name,
-      level,
-      difficulty,
-      category,
-      experience,
-      usedInProjects,
-      order,
-      iconName,
-    } = req.body;
+    // req.filesGridFS मध्ये uploaded files info आहे
+    // Example: [{ fieldname, filename }]
+    const iconFile = req.filesGridFS.find(f => f.fieldname === "icon");
 
-    if (!name || !level) {
-      return res.status(400).json({ error: "Name & Level are required" });
-    }
+    // Create your skill object
+    const newSkill = {
+      name: req.body.name,
+      level: Number(req.body.level),
+      difficulty: Number(req.body.difficulty),
+      category: req.body.category,
+      experience: req.body.experience,
+      usedInProjects: Number(req.body.usedInProjects),
+      order: Number(req.body.order),
+      icon: iconFile ? iconFile.filename : req.body.iconName || null,
+    };
 
-    const skill = await Skill.create({
-      name: name.trim(),
-      level: Number(level),
-      difficulty: Number(difficulty) || 1,
-      category: category || "General",
-      experience: experience ? String(experience) : "0 months",
-      usedInProjects: Number(usedInProjects) || 0,
-      order: Number(order) || 0,
-      icon: req.file ? `skills/${req.file.filename}` : (iconName || "Code2"),
-    });
+    // Save skill to database (assuming Skill is your Mongoose model)
+    const skill = await Skill.create(newSkill);
 
-    res.json({ success: true, skill });
-
+    res.json({ message: "Skill added successfully", skill });
   } catch (err) {
-    console.log("Create Skill Error:", err);
-    res.status(500).json({ error: "Failed to create skill" });
+    console.error("Skill Add Error:", err);
+    res.status(500).json({ error: "Failed to add skill" });
   }
 });
-
 /* --------------------------------------
    GET ALL SKILLS
 ----------------------------------------- */
