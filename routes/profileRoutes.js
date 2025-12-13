@@ -265,7 +265,8 @@ import express from "express";
 import mongoose from "mongoose";
 import Profile from "../models/Profile.js";
 import auth from "../middleware/auth.js";
-import upload from "../utils/upload.js";
+// import upload from "../utils/upload.js";
+import upload from "../middleware/upload.js";
 import Grid from "gridfs-stream";
 
 const router = express.Router();
