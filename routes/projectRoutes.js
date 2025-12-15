@@ -179,7 +179,9 @@ router.post("/", auth, upload.single("image"), async (req, res) => {
       description,
       github,
       live,
-      tech: tech.split(",").map((t) => t.trim()),
+      // tech: tech.split(",").map((t) => t.trim()),
+      tech: tech ? tech.split(",").map(t => t.trim()) : [],
+
       image: req.file ? "projects/" + req.file.filename : null,
     });
 
@@ -221,7 +223,9 @@ router.put("/:id", auth, upload.single("image"), async (req, res) => {
       description,
       github,
       live,
-      tech: tech.split(",").map((t) => t.trim()),
+      // tech: tech.split(",").map((t) => t.trim()),
+      tech: tech ? tech.split(",").map(t => t.trim()) : [],
+
     };
 
     // If new image is uploaded

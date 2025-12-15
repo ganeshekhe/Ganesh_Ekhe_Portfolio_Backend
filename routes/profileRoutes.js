@@ -57,20 +57,11 @@
 
 // export default router;
 
+import auth from "../middleware/auth.js";
 
 import express from "express";
 import multer from "multer";
 import Profile from "../models/profile.js";
-import auth from "../middleware/auth.js";
-
-import fs from "fs";
-
-["uploads/profile/images", "uploads/profile/resume", "uploads/profile/certificates"]
-  .forEach(dir => {
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-  });
 
 const router = express.Router();
 
@@ -113,12 +104,14 @@ router.get("/", async (req, res) => {
 
 router.put(
   "/",
+  auth,
   upload.fields([
     { name: "image", maxCount: 1 },
     { name: "resume", maxCount: 1 },
     { name: "certificates", maxCount: 20 },
   ]),
   async (req, res) => {
+
     try {
       const data = req.body;
 
