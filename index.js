@@ -21,7 +21,15 @@ dotenv.config();
 const app = express();
 
 // Middlewares
-app.use(cors());
+// app.use(cors());
+app.use(cors({
+  origin: [
+    "http://localhost:5173",
+    "https://ganesh-ekhe-portfolio.vercel.app/"
+  ],
+  credentials: true
+}));
+
 app.use(express.json());
 
 app.use("/uploads", express.static("uploads"));
@@ -64,10 +72,14 @@ app.post("/contact", async (req, res) => {
 });
 
 // API ROUTES (protected where needed)
-app.use("/projects", projectRoutes);
-app.use("/skills", skillRoutes);
+// app.use("/projects", projectRoutes);
+// app.use("/skills", skillRoutes);
+// // app.use("/profile", profileRoutes);
 // app.use("/profile", profileRoutes);
-app.use("/profile", profileRoutes);
+
+app.use("/api/projects", projectRoutes);
+app.use("/api/skills", skillRoutes);
+app.use("/api/profile", profileRoutes);
 
 // MongoDB connect and start server
 const PORT = process.env.PORT || 5000;
