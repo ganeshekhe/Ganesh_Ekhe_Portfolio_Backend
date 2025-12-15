@@ -61,6 +61,16 @@
 import express from "express";
 import multer from "multer";
 import Profile from "../models/profile.js";
+import auth from "../middleware/auth.js";
+
+import fs from "fs";
+
+["uploads/profile/images", "uploads/profile/resume", "uploads/profile/certificates"]
+  .forEach(dir => {
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+  });
 
 const router = express.Router();
 

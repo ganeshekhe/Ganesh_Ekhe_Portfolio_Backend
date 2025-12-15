@@ -25,7 +25,7 @@ const app = express();
 app.use(cors({
   origin: [
     "http://localhost:5173",
-    "https://ganesh-ekhe-portfolio.vercel.app/"
+    "https://YOUR-FRONTEND.vercel.app"
   ],
   credentials: true
 }));
@@ -72,14 +72,10 @@ app.post("/contact", async (req, res) => {
 });
 
 // API ROUTES (protected where needed)
-// app.use("/projects", projectRoutes);
-// app.use("/skills", skillRoutes);
-// // app.use("/profile", profileRoutes);
-// app.use("/profile", profileRoutes);
-
 app.use("/api/projects", projectRoutes);
 app.use("/api/skills", skillRoutes);
 app.use("/api/profile", profileRoutes);
+
 
 // MongoDB connect and start server
 const PORT = process.env.PORT || 5000;
@@ -92,95 +88,3 @@ mongoose
   .catch((err) => {
     console.error("DB Error:", err);
   });
-
-
-
-// import express from "express";
-// import cors from "cors";
-// import dotenv from "dotenv";
-// import mongoose from "mongoose";
-// import nodemailer from "nodemailer";
-// import Grid from "gridfs-stream";
-
-// // Routes
-// import adminRoutes from "./routes/adminRoutes.js";
-// import projectRoutes from "./routes/projectRoutes.js";
-// import skillRoutes from "./routes/skillRoutes.js";
-// import profileRoutes from "./routes/profileRoutes.js";
-
-// dotenv.config();
-
-// const app = express();
-
-// // Middlewares
-// app.use(cors());
-// app.use(express.json());
-
-// // MongoDB connection
-// const mongoURI = process.env.MONGO_URI;
-// const conn = mongoose.createConnection(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true });
-
-// let gfs;
-// conn.once("open", () => {
-//   gfs = Grid(conn.db, mongoose.mongo);
-//   gfs.collection("projects");
-//   console.log("GridFS Connected");
-// });
-
-// // Serve GridFS files
-// app.get("/uploads/projects/:filename", (req, res) => {
-//   gfs.files.findOne({ filename: req.params.filename }, (err, file) => {
-//     if (!file || file.length === 0) return res.status(404).json({ error: "File not found" });
-//     const readstream = gfs.createReadStream(file.filename);
-//     readstream.pipe(res);
-//   });
-// });
-
-// // TEST ROUTE
-// app.get("/", (req, res) => {
-//   res.send("Backend Working!");
-// });
-
-// // ADMIN ROUTES
-// app.use("/admin", adminRoutes);
-
-// // CONTACT API
-// app.post("/contact", async (req, res) => {
-//   const { name, email, message } = req.body;
-//   if (!name || !email || !message) {
-//     return res.status(400).json({ error: "All fields are required" });
-//   }
-//   try {
-//     const transporter = nodemailer.createTransport({
-//       service: "gmail",
-//       auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
-//     });
-
-//     await transporter.sendMail({
-//       from: email,
-//       to: process.env.EMAIL_USER,
-//       subject: `New message from ${name}`,
-//       text: `From: ${email}\n\n${message}`,
-//     });
-
-//     res.json({ success: true, message: "Email sent successfully!" });
-//   } catch (err) {
-//     console.error("Mail send error:", err);
-//     res.status(500).json({ error: "Email sending failed" });
-//   }
-// });
-
-// // API ROUTES
-// app.use("/projects", projectRoutes);
-// app.use("/skills", skillRoutes);
-// app.use("/profile", profileRoutes);
-
-// // Start Server
-// const PORT = process.env.PORT || 5000;
-// mongoose
-//   .connect(mongoURI)
-//   .then(() => {
-//     console.log("MongoDB Connected");
-//     app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-//   })
-//   .catch((err) => console.error("DB Error:", err));
