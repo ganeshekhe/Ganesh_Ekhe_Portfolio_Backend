@@ -1,5 +1,14 @@
+# # Node modules
+# node_modules/
+
+# # Uploads
+# uploads/
+
 # Node modules
 node_modules/
 
 # Uploads
 uploads/
+
+# Environment variables
+.env
